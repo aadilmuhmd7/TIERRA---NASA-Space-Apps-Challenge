@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIERRA | Terrestrial Analog Explorer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="brand-name">TIERRA</div>
+        <div class="brand-subtitle">Terrestrial Analog Explorer</div>
+    </header>
+
+    <!-- TOOLBAR: search + combinable filters -->
+    <div class="toolbar" role="search">
+        <label class="tool-field">
+            <span>Search</span>
+            <input id="search-input" type="search" placeholder="Name, country or region" autocomplete="off">
+        </label>
+        <label class="tool-field">
+            <span>Planetary target</span>
+            <select id="filter-target">
+                <option value="all">All</option>
+                <option value="moon">Moon</option>
+                <option value="mars">Mars</option>
+            </select>
+        </label>
+        <label class="tool-field">
+            <span>Classification</span>
+            <select id="filter-status">
+                <option value="all">All</option>
+                <option value="possible">Possible analogue</option>
+                <option value="found">Found analogue</option>
+                <option value="custom">Custom marker</option>
+            </select>
+        </label>
+        <div class="tool-field">
+            <span>Analogue characteristics</span>
+            <details class="tool-menu" id="char-menu">
+                <summary id="char-summary">Any</summary>
+                <div class="menu-panel" id="char-options"></div>
+            </details>
+        </div>
+        <button id="clear-filters" class="btn" type="button">Clear filters</button>
+        <button id="reset-view" class="btn" type="button">Reset view</button>
+    </div>
+
+    <main class="workspace" id="workspace">
+
+        <section class="map-section">
+            <div class="panel-title">
+                <span>Global analogue locations</span>
+                <span id="map-status">Loading…</span>
+            </div>
+            <div id="map"></div>
+            <div class="map-footer">
+                <span id="coordinates">Lat -- | Lon --</span>
+                <span id="selected-label">No location selected</span>
+            </div>
+        </section>
+
+        <div id="divider" class="divider" role="separator" aria-orientation="vertical"
+             aria-label="Resize information panel (double-click to reset)"
+             tabindex="0" title="Drag to resize. Double-click to reset."></div>
+
+        <aside class="information-panel" id="information-panel">
+            <div class="panel-title">
+                <span>Location information</span>
+                <span id="record-number">Overview</span>
+            </div>
+            <div id="info-panel">
+                <!-- Rendered by script.js: Global Survey Overview, or the selected site record -->
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- BOTTOM STATUS BAR -->
+    <footer class="bottom-bar">
+        <div class="status-cell" title="Candidate site requiring further investigation">
+            <span class="mini-pin possible"></span><span>Possible analogue</span>
+        </div>
+        <div class="status-cell" title="Established analogue site">
+            <span class="mini-pin found"></span><span>Found analogue</span>
+        </div>
+        <div class="status-cell" title="Your own marker, not a research record">
+            <span class="mini-pin custom"></span><span>Custom</span>
+        </div>
+
+        <div class="bar-spacer" id="mode-hint" aria-live="polite"></div>
+
+        <button id="btn-add-location" class="btn" type="button" aria-pressed="false">Add location</button>
+        <button id="btn-notes" class="btn" type="button">Notes</button>
+        <button id="btn-data" class="btn" type="button">Data</button>
+        <button id="btn-method" class="btn" type="button">Methodology</button>
+    </footer>
+
+
+    <!-- ========== WINDOWS ========== -->
+
+    <!-- Methodology & Assessment (large, draggable, editable) -->
+    <div class="dialog-backdrop" id="dlg-method" hidden>
+        <div class="dialog dialog-large" role="dialog" aria-modal="true" aria-labelledby="dlg-method-title">
+            <div class="dialog-titlebar">
+                <span id="dlg-method-title">METHODOLOGY &amp; ASSESSMENT</span>
+                <button class="dialog-close" type="button" data-close aria-label="Close">&times;</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-content" id="meth-body"></div>
+            </div>
+            <div class="dialog-footer">
+                <span id="meth-status" class="dialog-status" aria-live="polite"></span>
+                <button id="meth-edit" class="btn" type="button">Edit</button>
+                <button id="meth-save" class="btn" type="button" hidden>Save</button>
+                <button id="meth-cancel" class="btn" type="button" hidden>Cancel</button>
+                <button class="btn" type="button" data-close>Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record editor (large, draggable) -->
+    <div class="dialog-backdrop" id="dlg-editor" data-modal-lock hidden>
+        <div class="dialog dialog-large dialog-editor" role="dialog" aria-modal="true" aria-labelledby="dlg-editor-title">
+            <div class="dialog-titlebar">
+                <span id="dlg-editor-title">RECORD EDITOR</span>
+                <button class="dialog-close" type="button" data-close aria-label="Close">&times;</button>
+            </div>
+            <div class="dialog-body" id="ed-body"></div>
+            <div class="dialog-footer">
+                <span id="ed-error" class="dialog-error" role="alert"></span>
+                <button id="ed-save" class="btn" type="button">Save record</button>
+                <button class="btn" type="button" data-close>Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earth / planetary comparison viewer -->
+    <div class="dialog-backdrop" id="dlg-compare" hidden>
+        <div class="dialog dialog-large dialog-wide" role="dialog" aria-modal="true" aria-labelledby="dlg-compare-title">
+            <div class="dialog-titlebar">
+                <span id="dlg-compare-title">EARTH–MOON–MARS COMPARISON</span>
+                <button class="dialog-close" type="button" data-close aria-label="Close">&times;</button>
+            </div>
+            <div class="dialog-body" id="cmp-body"></div>
+            <div class="dialog-footer">
+                <button class="btn" type="button" data-close>Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data manager -->
+    <div class="dialog-backdrop" id="dlg-data" hidden>
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-data-title">
+            <div class="dialog-titlebar">
+                <span id="dlg-data-title">DATA MANAGER</span>
+                <button class="dialog-close" type="button" data-close aria-label="Close">&times;</button>
+            </div>
+            <div class="dialog-body">
+                <div id="data-summary" class="dialog-readout"></div>
+                <div class="data-buttons">
+                    <button id="data-new" class="btn" type="button">New research record</button>
+                    <button id="data-export" class="btn" type="button">Export JSON</button>
+                    <button id="data-import" class="btn" type="button">Import JSON…</button>
+                    <button id="data-clear" class="btn" type="button">Clear local edits</button>
+                </div>
+                <input id="import-file" type="file" accept=".json,application/json" hidden>
+                <div id="data-message" class="dialog-status" aria-live="polite" style="margin-top:8px"></div>
+                <p class="dialog-note">
+                    Edits are stored in this browser only. They do not change <code>locations.json</code> on the
+                    server or on GitHub. To publish your research: choose <b>Export JSON</b>, then replace
+                    <code>locations.json</code> in your project with the downloaded file.
+                </p>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" type="button" data-close>Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="dialog-backdrop" id="dlg-notes" hidden>
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-notes-title">
+            <div class="dialog-titlebar">
+                <span id="dlg-notes-title">Notes</span>
+                <button class="dialog-close" type="button" data-close aria-label="Close">&times;</button>
+            </div>
+            <div class="dialog-body">
+                <label for="notes-text" class="dialog-label">Personal notes (saved in this browser only)</label>
+                <textarea id="notes-text" class="text-area" rows="10" spellcheck="true"></textarea>
+            </div>
+            <div class="dialog-footer">
+                <span id="notes-status" class="dialog-status" aria-live="polite"></span>
+                <button id="notes-save" class="btn" type="button">Save</button>
+                <button class="btn" type="button" data-close>Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add custom marker -->
+    <div class="dialog-backdrop" id="dlg-add" hidden>
+        <div class="dialog dialog-small" role="dialog" aria-modal="true" aria-labelledby="dlg-add-title">
+            <div class="dialog-titlebar">
+                <span id="dlg-add-title">Add location</span>
+                <button class="dialog-close" type="button" data-close aria-label="Cancel">&times;</button>
+            </div>
+            <div class="dialog-body">
+                <label for="add-name" class="dialog-label">Name</label>
+                <input id="add-name" class="text-input" type="text" maxlength="80" autocomplete="off">
+                <div id="add-error" class="dialog-error" role="alert"></div>
+                <div class="dialog-label" style="margin-top:10px">Coordinates</div>
+                <div id="add-coords" class="dialog-readout"></div>
+            </div>
+            <div class="dialog-footer">
+                <button id="add-save" class="btn" type="button">Save</button>
+                <button class="btn" type="button" data-close>Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

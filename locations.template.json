@@ -1,0 +1,152 @@
+{
+  "_readme": "Blank record showing every field. Copy the object inside 'locations' into locations.json and fill it in. Leave anything you do not need empty. 'images' is a list of location images. 'body' must be 'moon' or 'mars'. 'comparisons' is keyed by body and should have one entry for each target you list. 'characteristics' keys: geology, terrain, temperature, water, dust, biology, subsurface, exploration. 'assessment' is reserved for a future documented assessment method and can stay empty.",
+  "locations": [
+    {
+      "id": "unique-site-id",
+      "name": "",
+      "country": "",
+      "region": "",
+      "lat": 0,
+      "lon": 0,
+      "elevation": "",
+      "status": "possible",
+      "description": "",
+      "setting": "",
+      "images": [
+        {
+          "src": "",
+          "caption": "",
+          "credit": ""
+        }
+      ],
+      "targets": [
+        {
+          "body": "mars",
+          "environment": "",
+          "context": ""
+        }
+      ],
+      "characteristics": {
+        "geology": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        },
+        "terrain": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        },
+        "temperature": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        },
+        "water": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        },
+        "dust": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        },
+        "biology": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        },
+        "subsurface": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        },
+        "exploration": {
+          "text": "",
+          "images": [
+            {
+              "src": "",
+              "caption": "",
+              "credit": ""
+            }
+          ]
+        }
+      },
+      "comparisons": {
+        "mars": {
+          "earthObservations": "",
+          "planetaryObservations": "",
+          "similarities": "",
+          "differences": ""
+        }
+      },
+      "relevance": {
+        "application": "",
+        "robotic": "",
+        "human": ""
+      },
+      "evidenceNotes": "",
+      "references": [
+        {
+          "title": "",
+          "authors": "",
+          "year": "",
+          "journal": "",
+          "doi": "",
+          "url": "",
+          "dataset": "",
+          "instrument": "",
+          "notes": ""
+        }
+      ],
+      "assessment": [
+        {
+          "characteristic": "",
+          "earthEvidence": "",
+          "planetaryEvidence": "",
+          "similarity": "",
+          "differences": "",
+          "confidence": "",
+          "application": "",
+          "references": ""
+        }
+      ]
+    }
+  ]
+}
